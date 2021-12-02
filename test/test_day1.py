@@ -1,5 +1,10 @@
 """test day 1"""
-from src.day1 import get_data, count_increases, count_increases_by_window
+from src.day1 import (
+    get_data,
+    count_increases,
+    count_increases_by_window,
+    count_increases_by_variable_window,
+)
 
 
 def test_get_data():
@@ -27,6 +32,12 @@ def test_count_increases():
 def test_count_increases_by_window():
     data = get_data("./data/day1_sample.txt")
     assert count_increases_by_window(data) == 5
+
+
+def test_count_increases_by_variable_window():
+    data = get_data("./data/day1_sample.txt")
+    assert count_increases_by_variable_window(data, 3) == 5
+    assert count_increases_by_variable_window(data, 1) == 7
 
 
 def test_count_increases2():

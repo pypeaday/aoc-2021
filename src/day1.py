@@ -48,7 +48,26 @@ def count_increases_by_window(data: List[int]) -> int:
     return sum(points)
 
 
+def count_increases_by_variable_window(data: List[int], window: int = 3) -> int:
+    """count_increases_by_variable_window.
+
+    Args:
+        data (List[int]): data
+        window (int): window size
+
+    Returns:
+        int: number of times the depth increases over sliding windows of size=window
+    """
+    points = [
+        sum(data[i : i + window]) < sum(data[i + 1 : i + 1 + window])
+        for i in range(len(data) - window)
+    ]
+    return sum(points)
+
+
 if __name__ == "__main__":
     data = get_data("./data/day1.txt")
     print(f"Day 1 Solution 1 = {count_increases(data)}")
-    print(f"Day 2 Solution 1 = {count_increases_by_window(data)}")
+    print(f"Day 1 Solution 1 = {count_increases_by_variable_window(data, 1)}")
+    print(f"Day 1 Solution 2 = {count_increases_by_window(data)}")
+    print(f"Day 1 Solution 2 = {count_increases_by_variable_window(data, 3)}")
