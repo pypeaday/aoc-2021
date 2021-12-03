@@ -27,6 +27,17 @@ def get_data(filepath: str = "./data/day2_sample.txt") -> List[Tuple[str, int]]:
 
 
 def calculate_position(data: List[Tuple[str, int]], dim: str = "horizontal") -> int:
+    """calculate_position.
+
+    Using MAP and dim or "horizontal" or "depth" calculate the final position along "dim" of the sub
+
+    Args:
+        data (List[Tuple[str, int]]): data
+        dim (str): dim
+
+    Returns:
+        int:
+    """
 
     _map = _MAP[dim]
     res = sum([sub[1] * _map.get(sub[0], 0) for sub in data])
