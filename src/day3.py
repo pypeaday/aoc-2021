@@ -45,6 +45,17 @@ def _get_bit_of_interest_by_column_index(
     return str(func(set(bits), key=bits.count))
 
 
+def _get_power_consumption_values(data: List[str], func: Callable) -> str:
+
+    bit_length = len(data[0])
+    bits = [
+        _get_bit_of_interest_by_column_index(data, idx, func)
+        for idx in range(bit_length)
+    ]
+
+    return "".join(bits)
+
+
 def get_gamma_rate(data: List[str]) -> str:
     """get_gamma_rate.
 
@@ -55,12 +66,7 @@ def get_gamma_rate(data: List[str]) -> str:
         str:
     """
 
-    bit_length = len(data[0])
-    bits = [
-        _get_bit_of_interest_by_column_index(data, idx, max)
-        for idx in range(bit_length)
-    ]
-    return "".join(bits)
+    return _get_power_consumption_values(data, max)
 
 
 def get_delta_rate(data: List[str]) -> str:
@@ -72,13 +78,7 @@ def get_delta_rate(data: List[str]) -> str:
     Returns:
         str:
     """
-
-    bit_length = len(data[0])
-    bits = [
-        _get_bit_of_interest_by_column_index(data, idx, min)
-        for idx in range(bit_length)
-    ]
-    return "".join(bits)
+    return _get_power_consumption_values(data, min)
 
 
 def _convert_and_multiply(v: str, u: str) -> int:
