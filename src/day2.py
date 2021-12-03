@@ -77,13 +77,15 @@ def calculate_position_with_aim(
     Returns:
         int:
     """
-    aims = get_aims(data)
-    _map = _MAP["horizontal"]
 
-    if dim == "horizontal":
-        return calculate_position(data, dim)
+    _map = _MAP["horizontal"]
+    aim_matters = dim == "depth"
+    if aim_matters:
+        aims = get_aims(data)
     else:
-        return sum([aim * sub[1] * _map.get(sub[0], 0) for aim, sub in zip(aims, data)])
+        aims = [1 for _ in data]
+
+    return sum([aim * sub[1] * _map.get(sub[0], 0) for aim, sub in zip(aims, data)])
 
 
 if __name__ == "__main__":
