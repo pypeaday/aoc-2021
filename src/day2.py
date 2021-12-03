@@ -32,3 +32,10 @@ def calculate_position(data: List[Tuple[str, int]], dim: str = "horizontal") -> 
     res = sum([sub[1] * _map.get(sub[0], 0) for sub in data])
 
     return res
+
+
+if __name__ == "__main__":
+    data = get_data("./data/day2.txt")
+    print(
+        f"day 2 solution 1: {calculate_position(data, 'horizontal') * calculate_position(data, 'depth')}"
+    )
