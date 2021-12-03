@@ -5,7 +5,9 @@ from src.day3 import (
     _get_bit_of_interest_by_column_index,
     get_gamma_rate,
     get_delta_rate,
-    get_power_consumption,
+    _convert_and_multiply,
+    get_o2_generator_rating,
+    get_co2_generator_rating,
 )
 
 import pytest
@@ -64,7 +66,17 @@ def test_get_delta_rate():
     assert get_delta_rate(data) == delta_rate
 
 
-def test_get_power_consumption():
+def test__convert_and_multiply():
     gamma_rate = "10110"
     delta_rate = "01001"
-    assert get_power_consumption(gamma_rate, delta_rate) == 198
+    assert _convert_and_multiply(gamma_rate, delta_rate) == 198
+
+
+def test_get_o2_generator_rating():
+    data = my_data()
+    assert get_o2_generator_rating(data) == "10111"
+
+
+def test_get_co2_generator_rating():
+    data = my_data()
+    assert get_co2_generator_rating(data) == "01010"
