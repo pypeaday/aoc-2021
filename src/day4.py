@@ -1,5 +1,5 @@
 """day 4 module"""
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Dict
 
 
 def get_data(
@@ -42,14 +42,18 @@ def find_all_idx(ls: List, val: Any) -> List:
 
 def like_zeros(ls: List) -> List:
     """Recursively copy a nested iterable and return zeros"""
+    my_list = [x for x in ls]
 
-    for i, v in enumerate(ls):
-        if isinstance(v, int):
-            ls[i] = 0
-        else:
-            ls[i] = like_zeros(v)
+    def __like_zeros(ls: List) -> List:
+        for i, v in enumerate(ls):
+            if isinstance(v, int):
+                ls[i] = 0
+            else:
+                ls[i] = like_zeros(v)
 
-    return ls
+        return ls
+
+    return __like_zeros(my_list)
 
 
 def is_winner(board_marks: List[List[int]]) -> bool:
@@ -67,68 +71,77 @@ def is_winner(board_marks: List[List[int]]) -> bool:
     return False
 
 
-def mark_elements_on_board(boards, drawn):
-    """mark_elements_on_board.
-    returns index of bingo matches for a paricular turn
+def take_one_turn_on_one_board(drawn: int, board: List[List[int]]) -> List[List[int]]:
+    mark = like_zeros(board)
+    for i, row in enumerate(board):
+        idx = find_all_idx(row, drawn)
+        for _id in idx:
+            mark[i][_id] = 1
+    return mark
 
-    Args:
-        boards:
-        drawn:
-    """
 
-    marks = [like_zeros(board) for board in boards]
+def combine_mark_from_one_board(
+    old_mark: List[List[int]], new_mark: List[List[int]]
+) -> List[List[int]]:
 
-    for board in boards:
-        for i, row in enumerate(board):
-            idx = find_all_idx(row, drawn)
-            for _id in idx:
-                marks[i][_id] = 1
-
-    return marks
+    mark = like_zeros(old_mark)
+    for i, old_row in enumerate(old_mark):
+        mark[i] = [sum([v, new_mark[i][j]]) for j, v in enumerate(old_row)]
+    return mark
 
 
 def combine_marks(
     old_marks: List[List[List[int]]], new_marks: List[List[List[int]]]
 ) -> List[List[List[int]]]:
-    marks = []
-    for prev_b1, new_b1 in zip(old_marks, new_marks):
-        marks.append(
-            [
-                [sum(items) for items in zip(*zipped_list)]
-                for zipped_list in zip(old_marks, new_marks)
-            ]
-        )
-
-    return marks
+    return [
+        combine_mark_from_one_board(old_mark, new_mark)
+        for old_mark, new_mark in zip(old_marks, new_marks)
+    ]
 
 
 def play_bingo(
     draw_values: List[int], boards: List[List[List[int]]]
-) -> Tuple[int, int]:
+) -> Tuple[int, int, int, Dict[int, List]]:
+    """play_bingo.
+
+    Args:
+        draw_values (List[int]): draw_values
+        boards (List[List[List[int]]]): boards
+
+    Returns:
+        Tuple[int, int, int, Dict[int, List]]:  number of turns till winner,value from drawn values that caused the win and index of the winning board, the state dictionary of marks
+    """
 
     # initialize zero-arrays like each board
     state_dict = {-1: [like_zeros(board) for board in boards]}
 
     for i, drawn in enumerate(draw_values):
-        new_marks = mark_elements_on_board(boards, drawn)
+        new_marks = [take_one_turn_on_one_board(drawn, board) for board in boards]
         state_dict[i] = combine_marks(state_dict[i - 1], new_marks)
-
-        print(marks)
-        breakpoint()
 
         # Check for winner
         if i < 5:
             # 5x5 board requires at least 5 turns
             continue
-        for j, board_marks in enumerate(marks):
+        for j, board_marks in enumerate(state_dict[i]):
             if is_winner(board_marks):
-                return (drawn, j)
-        print(i, drawn)
+                return (i, drawn, j, state_dict)
 
-    print("No Winner")
+    raise Exception("No Winner")
+
+
+def get_unmarked_numbers(marks: List[List[int]], board: List[List[int]]) -> List[int]:
+    values = []
+
+    for i, row in enumerate(marks):
+        values.extend([v for j, v in enumerate(board[i]) if not row[j]])
+    return values
 
 
 if __name__ == "__main__":
-    draw_values, boards = get_data()
+    draw_values, boards = get_data("./data/day4.txt")
 
-    print(f"Day 4 solution 1 is {play_bingo(draw_values, boards)}")
+    idx, val, board_id, state_dict = play_bingo(draw_values, boards)
+    winning_board = boards[board_id]
+    unmarked = get_unmarked_numbers(state_dict[idx][board_id], winning_board)
+    print(f"Day 4 solution 1 is {sum(unmarked) * val}")

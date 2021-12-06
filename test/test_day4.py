@@ -3,107 +3,62 @@ from src.day4 import (
     find_all_idx,
     like_zeros,
     is_winner,
-    play_bingo,
-    combine_marks,
-    mark_elements_on_board,
+    take_one_turn_on_one_board,
+    combine_mark_from_one_board,
+    get_unmarked_numbers,
 )
 
 
-def test_combine_marks():
+def test_get_unmarked_numbers():
+    marks = [[1, 1, 0], [1, 0, 1], [0, 1, 1]]
+    board = [[9, 8, 7], [6, 5, 4], [3, 2, 1]]
+    expected = [7, 5, 3]
+    assert get_unmarked_numbers(marks, board) == expected
 
-    drawn_values, boards = get_data()
 
-    test_draw = drawn_values[1]
-
-    state_dict = {
-        0: [
-            [
-                [0, 0, 0, 1, 0],
-                [0, 0, 0, 1, 0],
-                [0, 1, 0, 0, 1],
-                [0, 0, 0, 0, 1],
-                [0, 0, 0, 0, 0],
-            ],
-            [
-                [0, 0, 0, 0, 0],
-                [1, 0, 0, 0, 1],
-                [0, 0, 1, 0, 0],
-                [0, 1, 0, 0, 1],
-                [0, 0, 0, 0, 0],
-            ],
-            [
-                [0, 0, 0, 0, 1],
-                [0, 0, 0, 1, 0],
-                [0, 0, 0, 0, 0],
-                [0, 1, 0, 0, 1],
-                [0, 0, 0, 0, 1],
-            ],
-        ]
-    }
-
-    expected[
-        [
-            [0, 0, 0, 1, 0],
-            [0, 0, 0, 1, 0],
-            [0, 1, 0, 0, 1],
-            [0, 0, 0, 0, 1],
-            [0, 0, 0, 0, 0],
-        ],
-        [
-            [0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 1],
-            [0, 0, 1, 0, 0],
-            [0, 1, 0, 0, 1],
-            [0, 0, 0, 0, 0],
-        ],
-        [
-            [0, 0, 0, 0, 1],
-            [0, 0, 0, 1, 0],
-            [0, 0, 0, 0, 0],
-            [0, 1, 0, 0, 1],
-            [0, 0, 0, 0, 1],
-        ],
+def test_combine_mark_from_one_board():
+    mark = [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
     ]
-
-    marks = mark_elements_on_board(boards, test_draw)
-
-
-def test_mark_elements_on_board():
-
-    drawn_values, boards = get_data()
-
     expected = [
-        [
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-        ],
-        [
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 1, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-        ],
-        [
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1],
-        ],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 2],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+    ]
+    res = combine_mark_from_one_board(mark, mark)
+    for i, row in enumerate(mark):
+        breakpoint()
+        assert expected[i] == res[i]
+
+
+def test_take_one_turn_on_one_board():
+    drawn_values, boards = get_data()
+    drawn = drawn_values[0]  # 7
+    assert drawn == 7
+    board = boards[0]
+    assert board == [
+        [22, 13, 17, 11, 0],
+        [8, 2, 23, 4, 24],
+        [21, 9, 14, 16, 7],
+        [6, 10, 3, 18, 5],
+        [1, 12, 20, 15, 19],
     ]
 
-    test_draw = drawn_values[0]  # 7
-    assert test_draw == 7
+    mask = take_one_turn_on_one_board(drawn, board)
 
-    marks = mark_elements_on_board(boards, test_draw)
-
-    for i, _board in enumerate(expected):
-        for j, _row in enumerate(_board):
-            assert marks[i][j] == _row
+    assert mask == [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+    ]
 
 
 def test_get_data():
