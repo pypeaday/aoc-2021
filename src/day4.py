@@ -130,6 +130,42 @@ def play_bingo(
     raise Exception("No Winner")
 
 
+def play_bingo_to_lose(
+    draw_values: List[int], boards: List[List[List[int]]]
+) -> Tuple[int, int, int, Dict[int, List]]:
+    """play_bingo_to_lose.
+
+    Args:
+        draw_values (List[int]): draw_values
+        boards (List[List[List[int]]]): boards
+
+    Returns:
+        Tuple[int, int, int, Dict[int, List]]:  number of turns till last board wins,value from drawn values that caused the win and index of the last winning board, the state dictionary of marks
+    """
+
+    # initialize zero-arrays like each board
+    state_dict = {-1: [like_zeros(board) for board in boards]}
+
+    losers = [i for i in range(len(boards))]
+    print(losers)
+    for i, drawn in enumerate(draw_values):
+        new_marks = [take_one_turn_on_one_board(drawn, board) for board in boards]
+        state_dict[i] = combine_marks(state_dict[i - 1], new_marks)
+
+        # Check for winner
+        if i < 5:
+            # 5x5 board requires at least 5 turns
+            continue
+        for j, board_marks in enumerate(state_dict[i]):
+            if is_winner(board_marks) and j in losers:
+                if len(losers) == 1:
+                    return (i, drawn, losers[0], state_dict)
+                else:
+                    print("popping a board")
+                    losers.remove(j)
+    raise Exception("No Winner")
+
+
 def get_unmarked_numbers(marks: List[List[int]], board: List[List[int]]) -> List[int]:
     values = []
 
@@ -145,3 +181,7 @@ if __name__ == "__main__":
     winning_board = boards[board_id]
     unmarked = get_unmarked_numbers(state_dict[idx][board_id], winning_board)
     print(f"Day 4 solution 1 is {sum(unmarked) * val}")
+    idx, val, board_id, state_dict = play_bingo_to_lose(draw_values, boards)
+    winning_board = boards[board_id]
+    unmarked = get_unmarked_numbers(state_dict[idx][board_id], winning_board)
+    print(f"Day 4 solution 2 is {sum(unmarked) * val}")
