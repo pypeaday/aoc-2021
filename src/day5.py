@@ -1,5 +1,5 @@
 """day 5"""
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 
 def get_data(
@@ -90,6 +90,83 @@ def mark_board_with_1d_lines(
     return board
 
 
+def get_points_of_2d_line(
+    p1: Tuple[int, int], p2: Tuple[int, int]
+) -> Optional[List[Tuple[int, int]]]:
+    """get_points_of_2d_line.
+
+    Args:
+        p1 (Tuple[int]): p1 like (0,9)
+        p2 (Tuple[int]): p2 like (2,8)
+
+    Returns:
+        List[Tuple[int, int]]: indices of diagonal line
+    """
+    if p1[0] == p2[0] or p1[1] == p2[1]:
+        # handled in 1d lines
+        return None
+    if abs(p1[0] - p2[0]) == abs(p1[1] - p2[1]):
+        y1 = p1[0]
+        y2 = p2[0]
+        x1 = p1[1]
+        x2 = p2[1]
+
+        if x1 < x2 and y1 < y2:  # 45 down right
+            diagonal_points = [
+                (i, j)
+                for i, j in zip(
+                    [x for x in range(x1, x2 + 1)], [y for y in range(y1, y2 + 1)]
+                )
+            ]
+        elif x1 < x2 and y1 > y2:  # 45 down left
+            diagonal_points = [
+                (i, j)
+                for i, j in zip(
+                    [x for x in range(x1, x2 + 1)], [y for y in range(y1, y2 - 1, -1)]
+                )
+            ]
+        elif x1 > x2 and y1 > y2:  # 45 up right
+            diagonal_points = [
+                (i, j)
+                for i, j in zip(
+                    [x for x in range(x1, x2 - 1, -1)],
+                    [y for y in range(y1, y2 - 1, -1)],
+                )
+            ]
+        else:  # 45 up left
+            diagonal_points = [
+                (i, j)
+                for i, j in zip(
+                    [x for x in range(x1, x2 - 1, -1)],
+                    [y for y in range(y1, y2 + 1)],
+                )
+            ]
+        return diagonal_points
+    else:
+        return None
+
+
+def get_points_of_all_2d_lines(
+    data: List[Tuple[Tuple[int, int], Tuple[int, int]]]
+) -> List[List[Tuple[int, int]]]:
+
+    lines = [get_points_of_2d_line(points[0], points[1]) for points in data]
+
+    return [ls for ls in lines if ls]
+
+
+def mark_board_with_2d_lines(
+    lines: List[List[Tuple[int, int]]], board: List[List[int]]
+) -> List[List[int]]:
+    for line in lines:
+        for point in line:
+            rid = point[0]
+            cid = point[1]
+            board[rid][cid] += 1
+
+    return board
+
+
 def find_max(data: List) -> int:
     maxes = []
     for points in data:
@@ -120,7 +197,15 @@ if __name__ == "__main__":
     # data = get_data()
     lines_1d = get_points_of_all_1d_lines(data)
     board = initialize_board(data)
-    marked_board = mark_board_with_1d_lines(lines_1d, board)
-    count = count_overlaps(marked_board)
+    board = mark_board_with_1d_lines(lines_1d, board)
+    count = count_overlaps(board)
 
     print(f"Day 5 solution 1 is {count}")
+
+    lines_2d = get_points_of_all_2d_lines(data)
+    board2 = initialize_board(data)
+    board2 = mark_board_with_1d_lines(lines_1d, board2)
+    board2 = mark_board_with_2d_lines(lines_2d, board2)
+    count = count_overlaps(board2)
+
+    print(f"Day 5 solution 2 is {count}")
