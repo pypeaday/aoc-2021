@@ -4,14 +4,44 @@ from src.day4 import (
     like_zeros,
     is_winner,
     play_bingo,
-    update_marks,
+    combine_marks,
+    mark_elements_on_board,
 )
 
 
-def test_update_marks():
+def test_combine_marks():
+
     drawn_values, boards = get_data()
 
-    expected = [
+    test_draw = drawn_values[1]
+
+    state_dict = {
+        0: [
+            [
+                [0, 0, 0, 1, 0],
+                [0, 0, 0, 1, 0],
+                [0, 1, 0, 0, 1],
+                [0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 0],
+            ],
+            [
+                [0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 1],
+                [0, 0, 1, 0, 0],
+                [0, 1, 0, 0, 1],
+                [0, 0, 0, 0, 0],
+            ],
+            [
+                [0, 0, 0, 0, 1],
+                [0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 0],
+                [0, 1, 0, 0, 1],
+                [0, 0, 0, 0, 1],
+            ],
+        ]
+    }
+
+    expected[
         [
             [0, 0, 0, 1, 0],
             [0, 0, 0, 1, 0],
@@ -35,11 +65,41 @@ def test_update_marks():
         ],
     ]
 
-    test_draw = drawn_values[0]
+    marks = mark_elements_on_board(boards, test_draw)
 
-    marks = like_zeros(expected)
 
-    marks = update_marks(marks, boards, test_draw)
+def test_mark_elements_on_board():
+
+    drawn_values, boards = get_data()
+
+    expected = [
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ],
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 1, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ],
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1],
+        ],
+    ]
+
+    test_draw = drawn_values[0]  # 7
+    assert test_draw == 7
+
+    marks = mark_elements_on_board(boards, test_draw)
 
     for i, _board in enumerate(expected):
         for j, _row in enumerate(_board):
@@ -127,13 +187,13 @@ def test_is_winner():
     assert is_winner(data) is True
 
 
-def test_play_bingo():
-    draw_values, boards = get_data()
+# def test_play_bingo():
+#     draw_values, boards = get_data()
 
-    drawn = 24
-    board_idx = 2
+#     drawn = 24
+#     board_idx = 2
 
-    res = play_bingo(draw_values, boards)
+#     res = play_bingo(draw_values, boards)
 
-    # assert res[0] == drawn
-    assert res[1] == board_idx
+#     # assert res[0] == drawn
+#     # assert res[1] == board_idx

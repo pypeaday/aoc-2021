@@ -67,29 +67,38 @@ def is_winner(board_marks: List[List[int]]) -> bool:
     return False
 
 
-def update_marks(marks, boards, drawn):
-    def __mark_elements_on_board(
-        drawn: int, board: List[List[int]], board_marks: List[List[int]]
-    ):
-        """track the marked elements on board recurisvely
+def mark_elements_on_board(boards, drawn):
+    """mark_elements_on_board.
+    returns index of bingo matches for a paricular turn
 
-        Args:
-            draw_values (int): drawn value from data
-            board (List[List[int]]): one board
-            board_marks (List[List[int]]): marks for that one board
+    Args:
+        boards:
+        drawn:
+    """
 
+    marks = [like_zeros(board) for board in boards]
 
-        """
-
+    for board in boards:
         for i, row in enumerate(board):
             idx = find_all_idx(row, drawn)
             for _id in idx:
-                board_marks[i][_id] = 1
+                marks[i][_id] = 1
 
-        return board_marks
+    return marks
 
-    for j, board in enumerate(boards):
-        marks[j] = __mark_elements_on_board(drawn, board, marks[j])
+
+def combine_marks(
+    old_marks: List[List[List[int]]], new_marks: List[List[List[int]]]
+) -> List[List[List[int]]]:
+    marks = []
+    for prev_b1, new_b1 in zip(old_marks, new_marks):
+        marks.append(
+            [
+                [sum(items) for items in zip(*zipped_list)]
+                for zipped_list in zip(old_marks, new_marks)
+            ]
+        )
+
     return marks
 
 
@@ -98,15 +107,19 @@ def play_bingo(
 ) -> Tuple[int, int]:
 
     # initialize zero-arrays like each board
-    marks = [like_zeros(board) for board in boards]
+    state_dict = {-1: [like_zeros(board) for board in boards]}
 
     for i, drawn in enumerate(draw_values):
-        # Note recurrsion side-effect by design
-        marks = update_marks(marks, boards, drawn)
+        new_marks = mark_elements_on_board(boards, drawn)
+        state_dict[i] = combine_marks(state_dict[i - 1], new_marks)
+
         print(marks)
         breakpoint()
 
         # Check for winner
+        if i < 5:
+            # 5x5 board requires at least 5 turns
+            continue
         for j, board_marks in enumerate(marks):
             if is_winner(board_marks):
                 return (drawn, j)
