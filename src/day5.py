@@ -30,3 +30,27 @@ def get_data(filepath: str = "./data/day5_sample.txt") -> List[List[Tuple[int]]]
             x2, y2 = p2.split(",")
             data.append([(int(x1), int(y1)), (int(x2), int(y2))])
     return data
+
+
+def get_points_of_line(p1: Tuple[int], p2: Tuple[int]) -> Tuple[List[int], List[int]]:
+    """get_points_of_line.
+
+    Args:
+        p1 (Tuple[int]): p1 like (0,9)
+        p2 (Tuple[int]): p2 like (2,8)
+
+    Returns:
+        Tuple[List[int], List[int]]: horizontal index array and vertial index array
+    """
+
+    horizontal_points = [x for x in range(p1[0], p2[0])]
+    vertial_points = [y for y in range(p1[1], p2[1])]
+    return horizontal_points, vertial_points
+
+
+def initialize_board(data: List):
+
+    width = 9
+    height = len(data)
+    board = [[0 for _ in range(width)] for _ in range(height)]
+    return board
