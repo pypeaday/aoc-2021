@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 def get_data(
     filepath: str = "./data/day5_sample.txt",
-) -> List[Tuple[Tuple[int], Tuple[int]]]:
+) -> List[Tuple[Tuple[int, int], Tuple[int, int]]]:
     """get_data.
 
     Args:
@@ -70,13 +70,57 @@ def get_points_of_all_1d_lines(
     return [ls for ls in lines if ls[0]]
 
 
-def mark_board_with_1d_lines(lines: List[Tuple[List[int]]]):
-    pass
+def mark_board_with_1d_lines(
+    lines: List[Tuple[List[int], List[int]]], board: List[List[int]]
+) -> List[List[int]]:
+    for line in lines:
+        if len(line[0]) == 1:  # vertical line
+            column_id = line[0][0]
+            row_ids = line[1]
+            for row_id in row_ids:
+                board[row_id][column_id] += 1
+
+        elif len(line[1]) == 1:  # horizontal line
+            row_id = line[1][0]
+            column_ids = line[0]
+            row = board[row_id]
+            for column_id in column_ids:
+                row[column_id] += 1
+
+    return board
 
 
-def initialize_board(data: List):
+def find_max(data: List) -> int:
+    maxes = []
+    for points in data:
+        maxes.append(max(max(points[0]), max(points[1])))
+    return max(maxes) + 1
 
-    width = 9
-    height = len(data)
+
+def initialize_board(data: List) -> List[List[int]]:
+
+    width = find_max(data)
+    height = width
     board = [[0 for _ in range(width)] for _ in range(height)]
     return board
+
+
+def count_overlaps(board: List[List[int]]) -> int:
+    counter = 0
+    for row in board:
+        _max = max(row) + 1
+        for i in range(2, _max):
+            counter += row.count(i)
+    return counter
+
+
+if __name__ == "__main__":
+
+    data = get_data("./data/day5.txt")
+    # data = get_data()
+    lines_1d = get_points_of_all_1d_lines(data)
+    board = initialize_board(data)
+    marked_board = mark_board_with_1d_lines(lines_1d, board)
+    count = count_overlaps(marked_board)
+
+    print(f"Day 5 solution 1 is {count}")
