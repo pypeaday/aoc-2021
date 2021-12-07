@@ -32,3 +32,9 @@ def find_min(data) -> Tuple[int, int]:
             min_position = i
 
     return min_position, min_fuel
+
+
+if __name__ == "__main__":
+    data = get_data("./data/day7.txt")
+    pos, fuel = find_min(data)
+    print(f"Day 7 part 1 -- position: {pos}, fuel: {fuel}")
