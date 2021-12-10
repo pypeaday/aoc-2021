@@ -21,6 +21,17 @@ def pad_data(data: List[List[int]]) -> List[List[int]]:
 
 
 def find_low_points(data: List[List[int]]) -> Tuple[List[Tuple[int, int]], List[int]]:
+    """find_low_points.
+
+    iterate over each point in data and find points such that they are a local min
+    of the adjacent points to the left/right and up/down
+
+    Args:
+        data (List[List[int]]): data
+
+    Returns:
+        Tuple[List[Tuple[int, int]], List[int]]:
+    """
     possible_low_point_indices = [
         (i, j) for i in range(len(data)) for j in range(len(data[0]))
     ]
