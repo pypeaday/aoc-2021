@@ -27,27 +27,13 @@ def find_low_points(data: List[List[int]]) -> Tuple[List[Tuple[int, int]], List[
 
     padded_data = pad_data(data)
 
-    for i, padded_row in enumerate(padded_data[1:-1]):
-        row = padded_row[1:-1]
+    for i, row in enumerate(data):
         for j, v in enumerate(row):
             # Python optimized for "shoot first ask for forgiveness later"
-            try:
-                right_value = row[j + 1]
-            except IndexError:
-                right_value = 9
-            try:
-                left_value = row[j - 1]
-            except IndexError:
-                left_value = 9
-            try:
-                top_value = data[i - 1][j]
-            except IndexError:
-                top_value = 9
-            try:
-                bottom_value = data[i + 1][j]
-            except IndexError:
-                bottom_value = 9
-
+            right_value = padded_data[i + 1][j + 2]
+            left_value = padded_data[i + 1][j]
+            top_value = padded_data[i][j + 1]
+            bottom_value = padded_data[i + 2][j + 1]
             surrounding_values = [right_value, left_value, top_value, bottom_value]
 
             if all([v < s for s in surrounding_values]):
