@@ -219,7 +219,7 @@ def main(filepath: str = "./data/day11_sample.txt", num_steps: int = 1):
 
 if __name__ == "__main__":
     num_steps = 100
-    octopuses = main("./data/day11_sample.txt", num_steps)
+    octopuses = main("./data/day11.txt", num_steps)
     print(
         f"Total number of flashes: {sum([v for v in octopuses.num_flashes.values()])}"
     )
