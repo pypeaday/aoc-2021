@@ -1,6 +1,6 @@
 """day 11 module"""
 
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 
 class Octopus:
@@ -24,16 +24,23 @@ class Octopus:
         self._turn_number = -1
 
     def set_neighbor_idx(self, all_ids) -> List[Tuple[int, int]]:
+        possible_neighbors = [
+            (self.idx[0], self.idx[1] - 1),  # left
+            (self.idx[0], self.idx[1] + 1),  # right
+            (self.idx[0] - 1, self.idx[1]),  # above
+            (self.idx[0] + 1, self.idx[1]),  # below
+            (self.idx[0] - 1, self.idx[1] - 1),  # row up and left
+            (self.idx[0] - 1, self.idx[1] + 1),  # row down and left
+            (self.idx[0] + 1, self.idx[1] - 1),  # row up and right
+            (self.idx[0] + 1, self.idx[1] + 1),  # row down and right
+        ]
         neighbor_idx = []
-        for idx in all_ids:
-            # check if further back than starting col id
-            if self.col_id - idx[1] < 0:
+        for idx in possible_neighbors:
+            if idx[0] < 0 or idx[1] < 0:  # look for out of bounds
                 continue
-            if self.row_id - idx[0] < 0:
-                continue
-            if self.col_id + idx[1] > self.num_cols:
-                continue
-            if self.row_id + idx[0] > self.num_rows:
+            if (
+                idx[0] > self.num_rows or idx[1] > self.num_cols
+            ):  # look for out of bounds
                 continue
             # corner
             if abs(self.col_id - idx[1]) == 1 and abs(self.row_id - idx[0]) == 1:
@@ -43,43 +50,54 @@ class Octopus:
                 neighbor_idx.append(idx)
             elif abs(self.row_id - idx[0]) == 1:
                 neighbor_idx.append(idx)
-
         return neighbor_idx
 
     def take_a_turn(self, turn_no: int):
         "Gets ran after explicitly bumping the energy_level by 1"
         if turn_no == self._turn_number and self.flashed_this_turn:
             return None
+        elif turn_no == self._turn_number and not self.flashed_this_turn:
+            pass
         elif turn_no > self._turn_number and not self.flashed_this_turn:
             if abs(turn_no - self._turn_number) > 1:
                 print("issue, trying to skip turns")
                 raise ValueError
             self._turn_number = turn_no  # should equate to  +=1
+        elif turn_no > self._turn_number and self.flashed_this_turn:
+            print(
+                f"octopus {self.idx} already flashed on turn {turn_no} but internal set to {self._turn_number}"
+            )
         else:
+            print(
+                f"{self.idx}, {self._turn_number}, {turn_no}, {self.flashed_this_turn}"
+            )
             raise ValueError("error at take_a_turn")
 
         if self.energy_level > 9:
             self.flash()
 
     def flash(self):
-        self.energy_level = 0
+        # print(f"octopus {self.idx} blowing up!")
         self.flashed_this_turn = True
-
         octopus: Octopus
         for octopus in self.neighbors:
+            # print(f"octopus {self.idx} is flashing {octopus.idx}")
             octopus.get_flashed(turn_no=self._turn_number)
 
     def get_flashed(self, turn_no: int) -> None:
+        # print(f"octopus {self.idx} for flashed")
+        self.energy_level += 1
         if self.flashed_this_turn:
             return None
         else:
-            self.flashed_this_turn = True
-            self.energy_level += 1
             self.take_a_turn(turn_no=turn_no)
             return None
 
     def get_ready_to_take_a_turn(self):
         self.flashed_this_turn = False
+
+    def reset_energy(self):
+        self.energy_level = 0
 
     def bump_energy_level(self):
         self.energy_level += 1
@@ -103,14 +121,24 @@ def get_data(filepath: str = "./data/day11_sample.txt") -> List[List[int]]:
 
 
 class Octopuses:
-    def __init__(self, data: List[List[int]], octopuses: List["Octopus"]):
+    def __init__(
+        self,
+        data: List[List[int]],
+        octopuses: List["Octopus"],
+        all_ids: List[Tuple[int, int]],
+    ):
         self.octopuses = octopuses
         self.data = data
         self.grid = data
         self.octopus_grid = None
+        self.all_ids = all_ids
         self.initialize_grid()
         self.update_grid()
         self.show_grid()
+        for octopus in self.octopuses:
+            octopus.set_neighbor_idx(all_ids)
+            octopus.set_neighbors(self.octopuses)
+        self.num_flashes: Dict[int, int] = dict()
 
     def yield_octopus(self):
         for octopus in self.octopuses:
@@ -145,13 +173,18 @@ class Octopuses:
     def take_steps(self, num_steps: int):
 
         for i in range(num_steps):
+            # first bump energy levels
             for octopus in self.octopuses:
                 octopus.get_ready_to_take_a_turn()
                 octopus.bump_energy_level()
+            # now check for any flashing and domino effect flashing
+            for octopus in self.octopuses:
                 octopus.take_a_turn(turn_no=i)
-            print(
-                f"Number of flashes at step:{i} {sum([o.flashed_this_turn for o in self.octopuses])}"
-            )
+            for octopus in self.octopuses:
+                if octopus.flashed_this_turn:
+                    octopus.reset_energy()
+            self.num_flashes[i + 1] = sum([o.flashed_this_turn for o in self.octopuses])
+            print(f"Number of flashes at step:{i} {self.num_flashes[i+1]}")
             self.update_grid()
             self.show_grid()
             print("*" * 20)
@@ -178,10 +211,15 @@ def main(filepath: str = "./data/day11_sample.txt", num_steps: int = 1):
                 dims=(num_rows, num_cols),
             )
         )
-    octopuses = Octopuses(data, octopuses_ls)
+    octopuses = Octopuses(data, octopuses_ls, all_ids)
 
     octopuses.take_steps(num_steps)
+    return octopuses
 
 
 if __name__ == "__main__":
-    main("./data/day11_sample2.txt", num_steps=2)
+    num_steps = 100
+    octopuses = main("./data/day11_sample.txt", num_steps)
+    print(
+        f"Total number of flashes: {sum([v for v in octopuses.num_flashes.values()])}"
+    )
