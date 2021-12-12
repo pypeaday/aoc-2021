@@ -35,7 +35,15 @@ class Octopus:
                 continue
             if self.row_id + idx[0] > self.num_rows:
                 continue
-            neighbor_idx.append(idx)
+            # corner
+            if abs(self.col_id - idx[1]) == 1 and abs(self.row_id - idx[0]) == 1:
+                neighbor_idx.append(idx)
+            # cardinal
+            elif abs(self.col_id - idx[1]) == 1:
+                neighbor_idx.append(idx)
+            elif abs(self.row_id - idx[0]) == 1:
+                neighbor_idx.append(idx)
+
         return neighbor_idx
 
     def take_a_turn(self, turn_no: int):
@@ -142,7 +150,7 @@ class Octopuses:
                 octopus.bump_energy_level()
                 octopus.take_a_turn(turn_no=i)
             print(
-                f"Number of flashes at step:{i}\n {sum([o.flashed_this_turn for o in self.octopuses])}"
+                f"Number of flashes at step:{i} {sum([o.flashed_this_turn for o in self.octopuses])}"
             )
             self.update_grid()
             self.show_grid()
