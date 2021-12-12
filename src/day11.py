@@ -170,6 +170,26 @@ class Octopuses:
             new_grid.append(new_row)
         self.grid = new_grid
 
+    def find_flash_sync(self):
+        all_flash = False
+        i = 0
+        while not all_flash:
+            # first bump energy levels
+            for octopus in self.octopuses:
+                octopus.get_ready_to_take_a_turn()
+                octopus.bump_energy_level()
+            # now check for any flashing and domino effect flashing
+            for octopus in self.octopuses:
+                octopus.take_a_turn(turn_no=i)
+            for octopus in self.octopuses:
+                if octopus.flashed_this_turn:
+                    octopus.reset_energy()
+            self.num_flashes[i + 1] = sum([o.flashed_this_turn for o in self.octopuses])
+            if self.num_flashes[i + 1] == len(self.octopuses):
+                print(f"All octopuses flashed on turn: {i+1}")
+                return None
+            i += 1
+
     def take_steps(self, num_steps: int):
 
         for i in range(num_steps):
@@ -190,7 +210,7 @@ class Octopuses:
             print("*" * 20)
 
 
-def main(filepath: str = "./data/day11_sample.txt", num_steps: int = 1):
+def main(filepath: str = "./data/day11_sample.txt", num_steps: int = 1, part: int = 1):
 
     data = get_data(filepath)
 
@@ -212,8 +232,10 @@ def main(filepath: str = "./data/day11_sample.txt", num_steps: int = 1):
             )
         )
     octopuses = Octopuses(data, octopuses_ls, all_ids)
-
-    octopuses.take_steps(num_steps)
+    if part == 1:
+        octopuses.take_steps(num_steps)
+    if part == 2:
+        octopuses.find_flash_sync()
     return octopuses
 
 
@@ -223,3 +245,4 @@ if __name__ == "__main__":
     print(
         f"Total number of flashes: {sum([v for v in octopuses.num_flashes.values()])}"
     )
+    octopuses = main("./data/day11.txt", part=2)
