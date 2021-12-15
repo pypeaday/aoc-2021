@@ -147,7 +147,6 @@ def play_bingo_to_lose(
     state_dict = {-1: [like_zeros(board) for board in boards]}
 
     losers = [i for i in range(len(boards))]
-    print(losers)
     for i, drawn in enumerate(draw_values):
         new_marks = [take_one_turn_on_one_board(drawn, board) for board in boards]
         state_dict[i] = combine_marks(state_dict[i - 1], new_marks)
@@ -161,7 +160,6 @@ def play_bingo_to_lose(
                 if len(losers) == 1:
                     return (i, drawn, losers[0], state_dict)
                 else:
-                    print("popping a board")
                     losers.remove(j)
     raise Exception("No Winner")
 
